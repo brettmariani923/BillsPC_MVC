@@ -1,0 +1,22 @@
+﻿.input-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.bottom-left-input {
+    position: fixed;
+    top: 400px; 
+    left: 10px; 
+    padding: 10px; 
+    z-index: 1000; 
+}
+
+.bottom-right-input {
+    position: fixed;
+    top: 423px;
+    right: 12px;
+    padding: 10px;
+    z-index: 1000;
+}
+

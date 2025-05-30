@@ -14,7 +14,7 @@ namespace StatFinder.Models
         public  string Ability { get; set; }
         public  bool Legendary { get; set; }
         public string Region { get; set; }
-
+        public string ImageUrl { get; set; } 
     }
 }
 

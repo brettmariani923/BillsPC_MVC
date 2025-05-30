@@ -18,7 +18,7 @@ namespace StatFinder.Repos
             return _db.Query<PokemonInfo>(sql).ToList();
         }
 
-        public List<PokemonInfo> ReturnPokemonLike(string name, int limit = 25)
+        public List<PokemonInfo> ReturnPokemonLike(string name, int limit = 250)
         {
             return _db.Query<PokemonInfo>(
                 @"SELECT TOP (@Limit) * 

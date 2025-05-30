@@ -13,6 +13,7 @@ else
     <table class="table">
         <thead>
             <tr>
+                <th>Image</th>  
                 <th>PokemonID</th>
                 <th>Name</th>
                 <th>HP</th>
@@ -30,6 +31,16 @@ else
             @foreach (var p in Model)
             {
                 <tr>
+                    <td>
+                        @if (!string.IsNullOrEmpty(p.ImageUrl))
+                        {
+                            <img src="@p.ImageUrl" alt="@p.Name" width="50" />
+                        }
+                        else
+                        {
+                            <span>No image</span>
+                        }
+                    </td>
                     <td>@p.PokemonID</td>
                     <td>@p.Name</td>
                     <td>@p.HP</td>
@@ -45,8 +56,4 @@ else
             }
         </tbody>
     </table>
-}
-@if (ViewBag.Message != null)
-{
-    <p>@ViewBag.Message</p>
 }

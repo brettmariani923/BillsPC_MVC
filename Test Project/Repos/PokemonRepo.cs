@@ -1,7 +1,6 @@
 ﻿using Dapper;
 using System.Data;
 using StatFinder.Models;
-using System.Data.Common;
 
 namespace StatFinder.Repos
 {
@@ -20,17 +19,19 @@ namespace StatFinder.Repos
 
         public List<PokemonInfo> ReturnPokemonLike(string name, int limit = 250)
         {
-            return _db.Query<PokemonInfo>(
-                @"SELECT TOP (@Limit) * 
-                FROM dbo.Pokemon 
-                WHERE Name LIKE @NamePattern",
-                new
-                {
-                    Limit = limit,
-                    NamePattern = $"%{name}%"
-                }
-            ).ToList();
+            var parameters = new
+            {
+                NamePattern = $"%{name}%",
+                Limit = limit,
+            };
+            
+            var sql = @"SELECT TOP (@Limit) *
+                        FROM dbo.Pokemon
+                        WHERE Name LIKE @NamePattern;";
+            
+            return _db.Query<PokemonInfo>(sql, parameters).ToList();
         }
+
 
 
     }

@@ -1,0 +1,9 @@
+This is a website I built that works as a pokemon search engine
+it uses my personal database which contains all of the 
+stat information about each pokemon, as well as pokeapi to get images
+
+so we can get an understanding of how
+of how back end conecpts connect with front end concepts.
+
+The webstie is a pokemon search engine that uses both my personal database
+information and pokeapi 

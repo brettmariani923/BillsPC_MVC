@@ -1,7 +1,6 @@
 ﻿using Dapper;
 using System.Data;
 using StatFinder.Models;
-using System.Threading.Tasks;
 
 namespace StatFinder.Repos
 {
@@ -15,28 +14,28 @@ namespace StatFinder.Repos
 
         public async Task InsertAsync(int slot, string name)
         {
+            var pattern = "%" + name + "%";
+
             const string sql = @"
             INSERT INTO dbo.CurrentTeam (Slot, PokemonID)
-            SELECT @Slot, p.PokemonID
-            FROM dbo.Pokemon p
-            WHERE p.Name = @Name;";
+            VALUES (@Slot, (SELECT TOP (1) PokemonID FROM dbo.Pokemon WHERE Name LIKE @Pattern));";
 
-            var rows = await _db.ExecuteAsync(sql, new { Slot = slot, Name = name });
-            if (rows == 0) throw new InvalidOperationException($"No Pokémon found named '{name}'.");
+            await _db.ExecuteAsync(sql, new { Slot = slot, Pattern = pattern });
         }
+
 
         public async Task UpdateAsync(int slot, string name)
         {
-            const string sql = @"
-            UPDATE ct
-            SET ct.PokemonID = p.PokemonID
-            FROM dbo.CurrentTeam ct
-            JOIN dbo.Pokemon p ON p.Name = @Name
-            WHERE ct.Slot = @Slot;";
+            var pattern = "%" + name + "%";
 
-            var rows = await _db.ExecuteAsync(sql, new { Slot = slot, Name = name });
-            if (rows == 0) throw new InvalidOperationException($"No matching slot or Pokémon named '{name}'.");
+            const string sql = @"
+            UPDATE dbo.CurrentTeam
+            SET PokemonID = (SELECT TOP (1) PokemonID FROM dbo.Pokemon WHERE Name LIKE @Pattern)
+            WHERE Slot = @Slot;";
+
+            await _db.ExecuteAsync(sql, new { Slot = slot, Pattern = pattern });
         }
+
 
         public async Task RemoveAsync(int slot)
         {
@@ -48,9 +47,7 @@ namespace StatFinder.Repos
         public async Task<List<CurrentTeamInfo>> GetCurrentTeamAsync()
         {
             const string sql = @"
-            SELECT ct.Slot,
-                   p.Name,
-                   CAST(NULL AS nvarchar(200)) AS ImageUrl
+            SELECT ct.Slot, p.Name, CAST(NULL AS nvarchar(200)) AS ImageUrl
             FROM dbo.CurrentTeam ct
             JOIN dbo.Pokemon p ON p.PokemonID = ct.PokemonID
             ORDER BY ct.Slot;";
@@ -58,6 +55,7 @@ namespace StatFinder.Repos
             var team = await _db.QueryAsync<CurrentTeamInfo>(sql);
             return team.ToList();
         }
+
 
     }
 }

@@ -17,41 +17,38 @@ public class CurrentTeamController : Controller
     public async Task<IActionResult> CurrentTeam()
     {
         var team = await _repo.GetCurrentTeamAsync();
-
-        // fill sprites for the ~6 team members
         await Task.WhenAll(team.Select(async m =>
         {
             if (!string.IsNullOrWhiteSpace(m.Name))
                 m.ImageUrl = await _pokeApiService.GetPokemonImageUrlAsync(m.Name);
         }));
-
         return View("CurrentTeam", team);
     }
 
-
     [HttpPost]
-    public async Task<IActionResult> Insert(int slot, string Name)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Insert(int slot, string name)
     {
-        await _repo.InsertAsync(slot, Name);
-        var team = await _repo.GetCurrentTeamAsync();
-        return View("CurrentTeam", team);
+        await _repo.InsertAsync(slot, name);
+        return RedirectToAction(nameof(CurrentTeam));   
     }
 
     [HttpPost]
-    public async Task<IActionResult> Update(int slot, string Name)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Update(int slot, string name)
     {
-        await _repo.UpdateAsync(slot, Name);
-        var team = await _repo.GetCurrentTeamAsync();
-        return View("CurrentTeam", team);
+        await _repo.UpdateAsync(slot, name);
+        return RedirectToAction(nameof(CurrentTeam));   
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Remove(int slot)
     {
         await _repo.RemoveAsync(slot);
-        var team = await _repo.GetCurrentTeamAsync();
-        return View("CurrentTeam", team);
+        return RedirectToAction(nameof(CurrentTeam));   
     }
+
 }
 
 

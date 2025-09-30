@@ -1,37 +1,34 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using StatFinder.Models;
 using StatFinder.Repos;
-using StatFinder.Services;
+
 public class CurrentTeamController : Controller
 {
-    public readonly ICurrentTeamRepo _repo;
-    public readonly PokeApiService _pokeApiService;
+    private readonly ICurrentTeamRepo _repo;
 
-    public CurrentTeamController(IPokemonRepo repo, PokeApiService pokeApiService)
+    public CurrentTeamController(ICurrentTeamRepo repo) => _repo = repo;
+
+    [HttpPost]
+    public async Task<IActionResult> Insert(int slot, string pokemonName)
     {
-        _repo = repo;
-        _pokeApiService = pokeApiService;
+        await _repo.InsertAsync(slot, pokemonName);
+        var team = await _repo.GetCurrentTeamAsync();
+        return View("CurrentTeam", team);
     }
 
     [HttpPost]
-    public IActionResult Insert(int slot, string pokemonName)
+    public async Task<IActionResult> Update(int slot, string pokemonName)
     {
-        _repo.InsertPokemonInSlot(slot, pokemonName);
-        return View("CurrentTeam", _repo.GetCurrentTeam());
+        await _repo.UpdateAsync(slot, pokemonName);
+        var team = await _repo.GetCurrentTeamAsync();
+        return View("CurrentTeam", team);
     }
 
     [HttpPost]
-    public IActionResult Update(int slot, string pokemonName)
+    public async Task<IActionResult> Remove(int slot)
     {
-        _repo.UpdatePokemonInSlot(slot, pokemonName);
-        return View("CurrentTeam", _repo.GetCurrentTeam());
+        await _repo.RemoveAsync(slot);
+        var team = await _repo.GetCurrentTeamAsync();
+        return View("CurrentTeam", team);
     }
-
-    [HttpPost]
-    public IActionResult Remove(int slot)
-    {
-        _repo.RemoveFromSlot(slot);
-        return View("CurrentTeam", _repo.GetCurrentTeam());
-    }
-
 }
+
